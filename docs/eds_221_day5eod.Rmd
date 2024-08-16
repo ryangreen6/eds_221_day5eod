@@ -1,0 +1,63 @@
+---
+title: "us_tilapia_imports"
+author: "Ryan Green"
+date: "2024-08-16"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r}
+library(tidyverse)
+library(here)
+library(janitor)
+
+```
+
+```{r}
+us_tilapia_imports <- read_csv(here::here("data", "us_tilapia_imports.csv"))
+```
+
+```{r}
+imports_df <- us_tilapia_imports%>%pivot_longer(cols=-country, names_to= "year", values_to = "imports")
+```
+
+```{r}
+imports_df <- imports_df%>%
+dplyr::mutate(year= as.numeric(year))
+```
+
+```{r}
+yearly_tilapia_tot <- dplyr::group_by(imports_df) %>% group_by(imports, year)
+
+ggplot(data=yearly_tilapia_tot, aes(x=year, y=imports, color=country)) + geom_point(show.legend=FALSE)
+
+```
+
+```{r}
+latin_imports <- imports_df %>%
+  filter(country %in% c("Ecuador", "Honduras", "Costa Rica", "Mexico"))
+|>
+  group_by(country, year) |>
+  summarize(total_count=sum(count, na.rm=TRUE))
+
+ggplot(latin_imports, aes(year, imports)) + geom_line() +
+  
+  facet_wrap(~country)+
+  geom_line(color="red")+
+  theme_minimal()
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
